@@ -29,9 +29,9 @@ interface LeaderboardProps {
 }
 
 const getRankIcon = (rank: number) => {
-    if (rank === 1) return <Trophy className="w-5 h-5 text-yellow-100 drop-shadow-lg" />
-    if (rank === 2) return <Medal className="w-5 h-5 text-gray-100 drop-shadow-lg" />
-    if (rank === 3) return <Award className="w-5 h-5 text-amber-100 drop-shadow-lg" />
+    if (rank === 1) return <Trophy className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-100 drop-shadow-lg" />
+    if (rank === 2) return <Medal className="w-4 h-4 sm:w-5 sm:h-5 text-gray-100 drop-shadow-lg" />
+    if (rank === 3) return <Award className="w-4 h-4 sm:w-5 sm:h-5 text-amber-100 drop-shadow-lg" />
     return null
 }
 
@@ -91,19 +91,19 @@ export default function Leaderboard({ scores, activeAddress, userRank, userTotal
     }
 
     return (
-        <div className="w-full max-w-4xl mx-auto">
+        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <Card className="w-full p-0 overflow-hidden border-0 shadow-xl bg-gradient-to-br from-background via-background to-muted/20 backdrop-blur-sm">
                 {/* Header with gradient */}
-                <div className="bg-gradient-to-r from-purple-600/10 via-blue-600/10 to-pink-600/10 p-6 border-b border-border/50">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center animate-glow">
-                            <Sparkles className="w-5 h-5 text-white" />
+                <div className="bg-[#f59b30]/15 p-4 sm:p-6 border-b border-border/50">
+                    <div className="flex items-center gap-2 sm:gap-3 mb-4">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#3f90fa] flex items-center justify-center animate-glow">
+                            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                         </div>
                         <div>
-                            <h2 className="text-2xl font-bold gradient-text-animate">
+                            <h2 className="text-responsive-xl sm:text-2xl font-bold text-[#3f90fa]">
                                 Leaderboard
                             </h2>
-                            <p className="text-sm text-muted-foreground">Top performers in the competition</p>
+                            <p className="text-responsive-sm text-muted-foreground">Top performers in the competition</p>
                         </div>
                     </div>
 
@@ -115,7 +115,7 @@ export default function Leaderboard({ scores, activeAddress, userRank, userTotal
                                 placeholder="Search by username or address..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-10 bg-background/50 border-border/50 focus:border-purple-500/50 focus:ring-purple-500/20 transition-all duration-200"
+                                className="pl-10 bg-background/50 border-border/50 focus:border-orange-500/50 focus:ring-orange-500/20 transition-all duration-200 text-responsive-sm"
                             />
                         </div>
                         {searchQuery && (
@@ -130,31 +130,31 @@ export default function Leaderboard({ scores, activeAddress, userRank, userTotal
                         )}
                     </div>
                     {searchQuery && (
-                        <div className="mt-2 text-sm text-muted-foreground">
+                        <div className="mt-2 text-responsive-sm text-muted-foreground">
                             Found {filteredData.length} result{filteredData.length !== 1 ? 's' : ''} for "{searchQuery}"
                         </div>
                     )}
 
                     {/* User Rank Display */}
                     {activeAddress && userRank && userTotalPoints && (
-                        <div className="mt-4 p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-xl border border-purple-500/20">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-lg ${getRankColor(userRank)} ${getRankGlow(userRank)}`}>
+                        <div className="mt-4 p-3 sm:p-4 bg-gradient-to-r from-orange-500/10 to-green-500/10 rounded-xl border border-orange-500/20">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                                <div className="flex items-center gap-2 sm:gap-3">
+                                    <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-white font-bold text-responsive-base sm:text-lg ${getRankColor(userRank)} ${getRankGlow(userRank)}`}>
                                         {getRankIcon(userRank) || userRank}
                                     </div>
                                     <div>
-                                        <div className="font-semibold text-purple-700 dark:text-purple-300">Your Ranking</div>
-                                        <div className="text-sm text-muted-foreground">
+                                        <div className="font-semibold text-responsive-sm sm:text-base text-orange-700 dark:text-orange-300">Your Ranking</div>
+                                        <div className="text-responsive-xs sm:text-sm text-muted-foreground">
                                             Rank #{userRank} of {leaderboardData.length} participants
                                         </div>
                                     </div>
                                 </div>
-                                <div className="text-right">
-                                    <div className="font-bold text-xl bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                                        {userTotalPoints} pts
+                                <div className="text-left sm:text-right">
+                                    <div className="font-bold text-responsive-lg sm:text-xl bg-gradient-to-r from-orange-600 to-green-600 bg-clip-text text-transparent">
+                                        {userTotalPoints} XP
                                     </div>
-                                    <div className="text-xs text-muted-foreground">Total Score</div>
+                                    <div className="text-responsive-xs text-muted-foreground">Total Score</div>
                                 </div>
                             </div>
                         </div>
@@ -162,23 +162,23 @@ export default function Leaderboard({ scores, activeAddress, userRank, userTotal
                 </div>
 
                 <CardContent className="p-0">
-                    <div className="space-y-3 p-6">
+                    <div className="space-y-2 sm:space-y-3 p-4 sm:p-6">
                         {filteredData.length === 0 ? (
-                            <div className="text-center py-12 text-muted-foreground">
+                            <div className="text-center py-8 sm:py-12 text-muted-foreground">
                                 {searchQuery ? (
                                     <div className="space-y-3">
-                                        <div className="text-xl font-medium">No results found</div>
-                                        <div className="text-sm opacity-75">Try adjusting your search terms</div>
+                                        <div className="text-responsive-lg sm:text-xl font-medium">No results found</div>
+                                        <div className="text-responsive-sm opacity-75">Try adjusting your search terms</div>
                                         <Button
                                             variant="outline"
                                             onClick={() => setSearchQuery("")}
-                                            className="mt-3 hover:bg-purple-500/10 hover:border-purple-500/50 transition-colors"
+                                            className="mt-3 hover:bg-orange-500/10 hover:border-orange-500/50 transition-colors"
                                         >
                                             Clear Search
                                         </Button>
                                     </div>
                                 ) : (
-                                    <div className="text-xl font-medium">No entries found</div>
+                                    <div className="text-responsive-lg sm:text-xl font-medium">No entries found</div>
                                 )}
                             </div>
                         ) : (
@@ -191,38 +191,38 @@ export default function Leaderboard({ scores, activeAddress, userRank, userTotal
                                         <DialogTrigger asChild>
                                             <Button
                                                 variant="ghost"
-                                                className={`w-full h-auto p-6 hover:bg-gradient-to-r hover:from-purple-500/10 hover:to-pink-500/10 transition-all duration-300 group ${isCurrentUser ? 'ring-2 ring-purple-500/50 bg-gradient-to-r from-purple-500/10 to-pink-500/10' : 'hover:scale-[1.02]'}`}
+                                                className={`w-full h-auto p-3 sm:p-6 hover:bg-gradient-to-r hover:from-orange-500/10 hover:to-green-500/10 transition-all duration-300 group ${isCurrentUser ? 'ring-2 ring-orange-500/50 bg-gradient-to-r from-orange-500/10 to-green-500/10' : 'hover:scale-[1.02]'}`}
                                                 onClick={() => setSelectedEntry(entry)}
                                             >
-                                                <div className="flex items-center justify-between w-full">
-                                                    <div className="flex items-center gap-4">
-                                                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-white font-bold text-lg ${getRankColor(rank)} ${getRankGlow(rank)} group-hover:scale-110 transition-transform duration-200`}>
+                                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-3 sm:gap-0">
+                                                    <div className="flex items-center gap-3 sm:gap-4">
+                                                        <div className={`w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center text-white font-bold text-responsive-base sm:text-lg ${getRankColor(rank)} ${getRankGlow(rank)} group-hover:scale-110 transition-transform duration-200`}>
                                                             {getRankIcon(rank) || rank}
                                                         </div>
-                                                        <div className="flex flex-col items-start">
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="font-bold text-lg group-hover:text-purple-600 transition-colors">
+                                                        <div className="flex flex-col items-start flex-1 min-w-0">
+                                                            <div className="flex items-center gap-2 w-full">
+                                                                <span className="font-bold text-responsive-base sm:text-lg group-hover:text-orange-600 transition-colors truncate">
                                                                     {entry.username}
                                                                 </span>
-                                                                <Badge variant="outline" className="text-xs font-mono bg-muted/50 border-border/50">
+                                                                <Badge variant="outline" className="text-responsive-xs font-mono bg-muted/50 border-border/50 flex-shrink-0">
                                                                     #{rank}
                                                                 </Badge>
                                                                 {isCurrentUser && (
-                                                                    <Badge variant="secondary" className="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0">
+                                                                    <Badge variant="secondary" className="text-responsive-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 flex-shrink-0">
                                                                         You
                                                                     </Badge>
                                                                 )}
                                                             </div>
-                                                            <span className="text-sm text-muted-foreground font-mono">
+                                                            <span className="text-responsive-sm text-muted-foreground font-mono truncate w-full">
                                                                 {truncateAddress(entry.address)}
                                                             </span>
                                                         </div>
                                                     </div>
-                                                    <div className="flex items-center gap-3">
-                                                        <Badge variant="outline" className="text-lg font-bold bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-purple-500/30 text-purple-700 dark:text-purple-300">
-                                                            {entry.totalPoints} pts
+                                                    <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-between sm:justify-end">
+                                                        <Badge variant="outline" className="text-responsive-base sm:text-lg font-bold bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-purple-500/30 text-purple-700 dark:text-purple-300">
+                                                            {entry.totalPoints} XP
                                                         </Badge>
-                                                        <Badge variant="secondary" className="text-xs bg-muted/50">
+                                                        <Badge variant="secondary" className="text-responsive-xs bg-muted/50">
                                                             {entry.entries.length} entries
                                                         </Badge>
                                                     </div>
@@ -230,47 +230,47 @@ export default function Leaderboard({ scores, activeAddress, userRank, userTotal
                                             </Button>
                                         </DialogTrigger>
 
-                                        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto bg-gradient-to-br from-background to-muted border-border">
+                                        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto bg-gradient-to-br from-background to-muted border-border mx-4 sm:mx-0">
                                             <DialogHeader>
                                                 <DialogTitle className="flex items-center gap-3">
-                                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold ${getRankColor(rank)}`}>
+                                                    <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-white font-bold ${getRankColor(rank)}`}>
                                                         {getRankIcon(rank) || rank}
                                                     </div>
                                                     <div>
-                                                        <div className="font-bold text-lg">{entry.username}</div>
-                                                        <div className="text-sm text-muted-foreground">{entry.totalPoints} points</div>
+                                                        <div className="font-bold text-responsive-lg sm:text-lg">{entry.username}</div>
+                                                        <div className="text-responsive-sm text-muted-foreground">{entry.totalPoints} XP</div>
                                                     </div>
                                                 </DialogTitle>
                                             </DialogHeader>
 
                                             <div className="space-y-4">
-                                                <div className="p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-xl border border-purple-500/20">
-                                                    <div className="font-semibold mb-3 text-purple-700 dark:text-purple-300">Player Info</div>
-                                                    <div className="text-sm space-y-2">
+                                                <div className="p-3 sm:p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-xl border border-purple-500/20">
+                                                    <div className="font-semibold mb-3 text-responsive-base sm:text-base text-purple-700 dark:text-purple-300">Player Info</div>
+                                                    <div className="text-responsive-sm space-y-2">
                                                         <div><span className="font-medium">Username:</span> {entry.username}</div>
-                                                        <div><span className="font-medium">Address:</span> <span className="font-mono bg-muted/50 px-2 py-1 rounded">{entry.address}</span></div>
-                                                        <div><span className="font-medium">Total Points:</span> <span className="font-bold text-purple-600">{entry.totalPoints}</span></div>
+                                                        <div><span className="font-medium">Address:</span> <span className="font-mono bg-muted/50 px-2 py-1 rounded text-responsive-xs break-all">{entry.address}</span></div>
+                                                        <div><span className="font-medium">Total XP:</span> <span className="font-bold text-purple-600">{entry.totalPoints}</span></div>
                                                         <div><span className="font-medium">Total Entries:</span> {entry.entries.length}</div>
                                                     </div>
                                                 </div>
 
                                                 <div>
-                                                    <div className="font-semibold mb-3">Individual Entries</div>
+                                                    <div className="font-semibold mb-3 text-responsive-base sm:text-base">Individual Entries</div>
                                                     <div className="space-y-3">
                                                         {entry.entries.map((score, scoreIndex) => (
-                                                            <Card key={scoreIndex} className="p-4 hover:bg-gradient-to-r hover:from-purple-500/5 hover:to-pink-500/5 transition-colors border-border/50">
-                                                                <div className="flex items-center justify-between">
+                                                            <Card key={scoreIndex} className="p-3 sm:p-4 hover:bg-gradient-to-r hover:from-purple-500/5 hover:to-pink-500/5 transition-colors border-border/50">
+                                                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                                                     <div className="flex flex-col flex-1">
-                                                                        <div className="font-medium">Entry #{scoreIndex + 1}</div>
-                                                                        <div className="text-sm text-muted-foreground mb-2">
+                                                                        <div className="font-medium text-responsive-base">Entry #{scoreIndex + 1}</div>
+                                                                        <div className="text-responsive-sm text-muted-foreground mb-2">
                                                                             {score.url ? (
                                                                                 <a
                                                                                     href={score.url}
                                                                                     target="_blank"
                                                                                     rel="noopener noreferrer"
-                                                                                    className="flex items-center gap-1 text-purple-600 hover:text-purple-800 transition-colors"
+                                                                                    className="flex items-center gap-1 text-purple-600 hover:text-purple-800 transition-colors break-all"
                                                                                 >
-                                                                                    View Link <ExternalLink className="w-3 h-3" />
+                                                                                    View Link <ExternalLink className="w-3 h-3 flex-shrink-0" />
                                                                                 </a>
                                                                             ) : (
                                                                                 "No URL provided"
@@ -279,15 +279,15 @@ export default function Leaderboard({ scores, activeAddress, userRank, userTotal
                                                                         {score.buckets && (
                                                                             <div className="flex flex-wrap gap-1">
                                                                                 {score.buckets.split(',').filter(bucket => bucket.trim()).map((bucket, bucketIndex) => (
-                                                                                    <Badge key={bucketIndex} variant="secondary" className="text-xs bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/20">
+                                                                                    <Badge key={bucketIndex} variant="secondary" className="text-responsive-xs bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/20">
                                                                                         {bucket.trim()}
                                                                                     </Badge>
                                                                                 ))}
                                                                             </div>
                                                                         )}
                                                                     </div>
-                                                                    <Badge variant="outline" className="font-bold bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-purple-500/30 ml-4">
-                                                                        {score.points} pts
+                                                                    <Badge variant="outline" className="font-bold bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-purple-500/30 sm:ml-4 w-fit">
+                                                                        {score.points} XP
                                                                     </Badge>
                                                                 </div>
                                                             </Card>

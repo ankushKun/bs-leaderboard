@@ -22,8 +22,8 @@ function Main() {
           logo: "t8cPU_PWjdLXRBAN89nzb9JQoRAf5ZBF2kkTZoxtJPc",
         },
         strategies: [
-          new WanderStrategy(),
           new WAuthStrategy({ provider: WAuthProviders.X }),
+          new WanderStrategy(),
           // Can also use more supported providers for web2 auth
           // new WAuthStrategy({ provider: WAuthProviders.Discord })
           // new WAuthStrategy({ provider: WAuthProviders.Github })
@@ -36,14 +36,12 @@ function Main() {
       }}
       theme={{ displayTheme: "dark" }}
     >
-      <ThemeProvider defaultTheme="light">
-        <HashRouter>
-          <Routes>
-            <Route index element={<App />} />
-            <Route path="/another-page" element={<AnotherPage />} />
-          </Routes>
-        </HashRouter>
-      </ThemeProvider>
+      <HashRouter>
+        <Routes>
+          <Route index element={<App />} />
+          <Route path="/another-page" element={<AnotherPage />} />
+        </Routes>
+      </HashRouter>
     </ArweaveWalletKit>
   )
 }

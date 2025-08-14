@@ -222,12 +222,12 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(45deg, #8b5cf6, #ec4899);
+  background: linear-gradient(45deg, #3f90fa, #3f90fa);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(45deg, #7c3aed, #db2777);
+  background: linear-gradient(45deg, #3f90fa, #3f90fa);
 }
 
 /* Focus styles */
@@ -245,4 +245,279 @@
 .dark .glass {
   background: rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================= */
+/* Responsive Font Sizes */
+/* ============================================= */
+
+/* Mobile-first responsive typography */
+.text-responsive-xs {
+  font-size: 0.75rem;
+  /* 12px */
+}
+
+.text-responsive-sm {
+  font-size: 0.875rem;
+  /* 14px */
+}
+
+.text-responsive-base {
+  font-size: 1rem;
+  /* 16px */
+}
+
+.text-responsive-lg {
+  font-size: 1.125rem;
+  /* 18px */
+}
+
+.text-responsive-xl {
+  font-size: 1.25rem;
+  /* 20px */
+}
+
+.text-responsive-2xl {
+  font-size: 1.5rem;
+  /* 24px */
+}
+
+.text-responsive-3xl {
+  font-size: 1.875rem;
+  /* 30px */
+}
+
+.text-responsive-4xl {
+  font-size: 2.25rem;
+  /* 36px */
+}
+
+.text-responsive-5xl {
+  font-size: 3rem;
+  /* 48px */
+}
+
+/* Tablet breakpoint (768px and up) */
+@media (min-width: 768px) {
+  .text-responsive-xs {
+    font-size: 0.75rem;
+    /* 12px */
+  }
+
+  .text-responsive-sm {
+    font-size: 0.875rem;
+    /* 14px */
+  }
+
+  .text-responsive-base {
+    font-size: 1rem;
+    /* 16px */
+  }
+
+  .text-responsive-lg {
+    font-size: 1.125rem;
+    /* 18px */
+  }
+
+  .text-responsive-xl {
+    font-size: 1.25rem;
+    /* 20px */
+  }
+
+  .text-responsive-2xl {
+    font-size: 1.5rem;
+    /* 24px */
+  }
+
+  .text-responsive-3xl {
+    font-size: 1.875rem;
+    /* 30px */
+  }
+
+  .text-responsive-4xl {
+    font-size: 2.25rem;
+    /* 36px */
+  }
+
+  .text-responsive-5xl {
+    font-size: 3rem;
+    /* 48px */
+  }
+}
+
+/* Desktop breakpoint (1024px and up) */
+@media (min-width: 1024px) {
+  .text-responsive-xs {
+    font-size: 0.75rem;
+    /* 12px */
+  }
+
+  .text-responsive-sm {
+    font-size: 0.875rem;
+    /* 14px */
+  }
+
+  .text-responsive-base {
+    font-size: 1rem;
+    /* 16px */
+  }
+
+  .text-responsive-lg {
+    font-size: 1.125rem;
+    /* 18px */
+  }
+
+  .text-responsive-xl {
+    font-size: 1.25rem;
+    /* 20px */
+  }
+
+  .text-responsive-2xl {
+    font-size: 1.5rem;
+    /* 24px */
+  }
+
+  .text-responsive-3xl {
+    font-size: 1.875rem;
+    /* 30px */
+  }
+
+  .text-responsive-4xl {
+    font-size: 2.25rem;
+    /* 36px */
+  }
+
+  .text-responsive-5xl {
+    font-size: 3rem;
+    /* 48px */
+  }
+}
+
+/* Large desktop breakpoint (1280px and up) */
+@media (min-width: 1280px) {
+  .text-responsive-xs {
+    font-size: 0.75rem;
+    /* 12px */
+  }
+
+  .text-responsive-sm {
+    font-size: 0.875rem;
+    /* 14px */
+  }
+
+  .text-responsive-base {
+    font-size: 1rem;
+    /* 16px */
+  }
+
+  .text-responsive-lg {
+    font-size: 1.125rem;
+    /* 18px */
+  }
+
+  .text-responsive-xl {
+    font-size: 1.25rem;
+    /* 20px */
+  }
+
+  .text-responsive-2xl {
+    font-size: 1.5rem;
+    /* 24px */
+  }
+
+  .text-responsive-3xl {
+    font-size: 1.875rem;
+    /* 30px */
+  }
+
+  .text-responsive-4xl {
+    font-size: 2.25rem;
+    /* 36px */
+  }
+
+  .text-responsive-5xl {
+    font-size: 3rem;
+    /* 48px */
+  }
+}
+
+/* Mobile-specific adjustments for better readability */
+@media (max-width: 767px) {
+
+  /* Reduce font sizes on mobile for better fit */
+  .text-responsive-lg {
+    font-size: 1rem;
+    /* 16px on mobile instead of 18px */
+  }
+
+  .text-responsive-xl {
+    font-size: 1.125rem;
+    /* 18px on mobile instead of 20px */
+  }
+
+  .text-responsive-2xl {
+    font-size: 1.25rem;
+    /* 20px on mobile instead of 24px */
+  }
+
+  .text-responsive-3xl {
+    font-size: 1.5rem;
+    /* 24px on mobile instead of 30px */
+  }
+
+  .text-responsive-4xl {
+    font-size: 1.875rem;
+    /* 30px on mobile instead of 36px */
+  }
+
+  .text-responsive-5xl {
+    font-size: 2.25rem;
+    /* 36px on mobile instead of 48px */
+  }
+
+  /* Improve line height for mobile readability */
+  .text-responsive-xs,
+  .text-responsive-sm,
+  .text-responsive-base,
+  .text-responsive-lg,
+  .text-responsive-xl,
+  .text-responsive-2xl,
+  .text-responsive-3xl,
+  .text-responsive-4xl,
+  .text-responsive-5xl {
+    line-height: 1.5;
+  }
+}
+
+/* Extra small mobile devices (320px and below) */
+@media (max-width: 320px) {
+  .text-responsive-lg {
+    font-size: 0.875rem;
+    /* 14px on very small screens */
+  }
+
+  .text-responsive-xl {
+    font-size: 1rem;
+    /* 16px on very small screens */
+  }
+
+  .text-responsive-2xl {
+    font-size: 1.125rem;
+    /* 18px on very small screens */
+  }
+
+  .text-responsive-3xl {
+    font-size: 1.25rem;
+    /* 20px on very small screens */
+  }
+
+  .text-responsive-4xl {
+    font-size: 1.5rem;
+    /* 24px on very small screens */
+  }
+
+  .text-responsive-5xl {
+    font-size: 1.875rem;
+    /* 30px on very small screens */
+  }
 }
