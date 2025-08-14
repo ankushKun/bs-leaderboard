@@ -6,7 +6,7 @@ import { ArweaveWalletKit } from "@arweave-wallet-kit/react"
 import WanderStrategy from "@arweave-wallet-kit/wander-strategy"
 import WAuthStrategy from "@wauth/strategy"
 import { WAuthProviders } from "@wauth/strategy"
-import AosyncStrategy from "@vela-ventures/aosync-strategy"
+// import AosyncStrategy from "@vela-ventures/aosync-strategy"
 
 import App from './App'
 import AnotherPage from './another-page'
@@ -23,20 +23,20 @@ function Main() {
         },
         strategies: [
           new WanderStrategy(),
-          new WAuthStrategy({ provider: WAuthProviders.Google }),
+          new WAuthStrategy({ provider: WAuthProviders.X }),
           // Can also use more supported providers for web2 auth
           // new WAuthStrategy({ provider: WAuthProviders.Discord })
           // new WAuthStrategy({ provider: WAuthProviders.Github })
           // new WAuthStrategy({ provider: WAuthProviders.X })
           // If you would like to use any provider other than the ones available,
           // just raise an issue and I'll try my best to add that
-          new AosyncStrategy()
+          // new AosyncStrategy()
         ],
         permissions: ["ACCESS_ADDRESS", "SIGNATURE", "SIGN_TRANSACTION"],
       }}
       theme={{ displayTheme: "dark" }}
     >
-      <ThemeProvider defaultTheme="dark">
+      <ThemeProvider defaultTheme="light">
         <HashRouter>
           <Routes>
             <Route index element={<App />} />
