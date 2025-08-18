@@ -4,10 +4,11 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { ExternalLink, Trophy, Medal, Award, Search, X, Sparkles } from "lucide-react"
+import { ExternalLink, Trophy, Medal, Award, Search, X, Sparkles, Twitter } from "lucide-react"
 
 type ScoreItem = {
     username: string
+    twitterUsername?: string // Twitter username (optional)
     url: string
     buckets: string // comma separated list of buckets
     points: number // calculated points for this entry
@@ -16,9 +17,11 @@ type ScoreItem = {
 
 type LeaderboardEntry = {
     username: string
+    twitterUsername?: string
     address: string
     totalPoints: number
     entries: ScoreItem[]
+    globalRank?: number
 }
 
 interface LeaderboardProps {
@@ -49,13 +52,40 @@ const getRankGlow = (rank: number) => {
     return "shadow-purple-500/20"
 }
 
+// Helper function to extract Twitter username from various formats
+const extractTwitterUsername = (username: string, twitterUsername?: string): string | null => {
+    if (twitterUsername) {
+        return twitterUsername.startsWith('@') ? twitterUsername : `@${twitterUsername}`
+    }
+
+    // Try to extract from username if it looks like a Twitter handle
+    if (username.startsWith('@')) {
+        return username
+    }
+
+    // Check if username contains twitter.com or x.com
+    if (username.includes('twitter.com/') || username.includes('x.com/')) {
+        const match = username.match(/(?:twitter\.com|x\.com)\/([a-zA-Z0-9_]+)/)
+        return match ? `@${match[1]}` : null
+    }
+
+    return null
+}
+
 export default function Leaderboard({ scores, activeAddress, userRank, userTotalPoints }: LeaderboardProps) {
     const [selectedEntry, setSelectedEntry] = useState<LeaderboardEntry | null>(null)
     const [searchQuery, setSearchQuery] = useState("")
 
-    // Group scores by address and sum up points
+    // Group scores by username (Twitter username if available, otherwise regular username)
     const leaderboardData: LeaderboardEntry[] = scores.reduce((acc, score) => {
-        const existingEntry = acc.find(entry => entry.address === score.address)
+        const twitterUsername = extractTwitterUsername(score.username, score.twitterUsername)
+        const groupKey = twitterUsername || score.username
+
+        const existingEntry = acc.find(entry => {
+            const entryTwitterUsername = extractTwitterUsername(entry.username, entry.twitterUsername)
+            const entryGroupKey = entryTwitterUsername || entry.username
+            return entryGroupKey === groupKey
+        })
 
         if (existingEntry) {
             existingEntry.totalPoints += score.points
@@ -63,6 +93,7 @@ export default function Leaderboard({ scores, activeAddress, userRank, userTotal
         } else {
             acc.push({
                 username: score.username,
+                twitterUsername: twitterUsername || undefined,
                 address: score.address,
                 totalPoints: score.points,
                 entries: [score]
@@ -72,22 +103,34 @@ export default function Leaderboard({ scores, activeAddress, userRank, userTotal
         return acc
     }, [] as LeaderboardEntry[])
 
-    // Sort by total points in descending order
+    // Sort by total points in descending order and assign global ranks
     leaderboardData.sort((a, b) => b.totalPoints - a.totalPoints)
+
+    // Add global rank to each entry
+    leaderboardData.forEach((entry, index) => {
+        entry.globalRank = index + 1
+    })
 
     // Filter data based on search query
     const filteredData = leaderboardData.filter((entry) => {
         if (!searchQuery.trim()) return true
 
         const query = searchQuery.toLowerCase().trim()
+        const twitterUsername = extractTwitterUsername(entry.username, entry.twitterUsername)
 
-        // Search in both username and address
+        // Search in username, Twitter username, and address (if available)
         return entry.username.toLowerCase().includes(query) ||
-            entry.address.toLowerCase().includes(query)
+            (twitterUsername && twitterUsername.toLowerCase().includes(query)) ||
+            (entry.address && entry.address.toLowerCase().includes(query))
     })
 
     const truncateAddress = (address: string) => {
         return `${address.slice(0, 6)}...${address.slice(-4)}`
+    }
+
+    const getDisplayName = (entry: LeaderboardEntry) => {
+        const twitterUsername = extractTwitterUsername(entry.username, entry.twitterUsername)
+        return twitterUsername || entry.username
     }
 
     return (
@@ -96,14 +139,14 @@ export default function Leaderboard({ scores, activeAddress, userRank, userTotal
                 {/* Header with gradient */}
                 <div className="bg-[#f59b30]/15 p-4 sm:p-6 border-b border-border/50">
                     <div className="flex items-center gap-2 sm:gap-3 mb-4">
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#3f90fa] flex items-center justify-center animate-glow">
-                            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#1DA1F2] flex items-center justify-center animate-glow">
+                            <Twitter className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                         </div>
                         <div>
-                            <h2 className="text-responsive-xl sm:text-2xl font-bold text-[#3f90fa]">
-                                Leaderboard
+                            <h2 className="text-responsive-xl sm:text-2xl font-bold text-[#1DA1F2]">
+                                Twitter Leaderboard
                             </h2>
-                            <p className="text-responsive-sm text-muted-foreground">Top performers in the competition</p>
+                            <p className="text-responsive-sm text-muted-foreground">Top performers by Twitter handle</p>
                         </div>
                     </div>
 
@@ -112,10 +155,10 @@ export default function Leaderboard({ scores, activeAddress, userRank, userTotal
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                             <Input
-                                placeholder="Search by username or address..."
+                                placeholder="Search by Twitter handle, username, or address..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-10 bg-background/50 border-border/50 focus:border-orange-500/50 focus:ring-orange-500/20 transition-all duration-200 text-responsive-sm"
+                                className="pl-10 bg-background/50 border-border/50 focus:border-[#1DA1F2]/50 focus:ring-[#1DA1F2]/20 transition-all duration-200 text-responsive-sm"
                             />
                         </div>
                         {searchQuery && (
@@ -137,21 +180,21 @@ export default function Leaderboard({ scores, activeAddress, userRank, userTotal
 
                     {/* User Rank Display */}
                     {activeAddress && userRank && userTotalPoints && (
-                        <div className="mt-4 p-3 sm:p-4 bg-gradient-to-r from-orange-500/10 to-green-500/10 rounded-xl border border-orange-500/20">
+                        <div className="mt-4 p-3 sm:p-4 bg-gradient-to-r from-[#1DA1F2]/10 to-[#1DA1F2]/20 rounded-xl border border-[#1DA1F2]/20">
                             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                 <div className="flex items-center gap-2 sm:gap-3">
                                     <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-white font-bold text-responsive-base sm:text-lg ${getRankColor(userRank)} ${getRankGlow(userRank)}`}>
                                         {getRankIcon(userRank) || userRank}
                                     </div>
                                     <div>
-                                        <div className="font-semibold text-responsive-sm sm:text-base text-orange-700 dark:text-orange-300">Your Ranking</div>
+                                        <div className="font-semibold text-responsive-sm sm:text-base text-[#1DA1F2]">Your Ranking</div>
                                         <div className="text-responsive-xs sm:text-sm text-muted-foreground">
                                             Rank #{userRank} of {leaderboardData.length} participants
                                         </div>
                                     </div>
                                 </div>
                                 <div className="text-left sm:text-right">
-                                    <div className="font-bold text-responsive-lg sm:text-xl bg-gradient-to-r from-orange-600 to-green-600 bg-clip-text text-transparent">
+                                    <div className="font-bold text-responsive-lg sm:text-xl bg-gradient-to-r from-[#1DA1F2] to-[#1DA1F2]/80 bg-clip-text text-transparent">
                                         {userTotalPoints} XP
                                     </div>
                                     <div className="text-responsive-xs text-muted-foreground">Total Score</div>
@@ -172,7 +215,7 @@ export default function Leaderboard({ scores, activeAddress, userRank, userTotal
                                         <Button
                                             variant="outline"
                                             onClick={() => setSearchQuery("")}
-                                            className="mt-3 hover:bg-orange-500/10 hover:border-orange-500/50 transition-colors"
+                                            className="mt-3 hover:bg-[#1DA1F2]/10 hover:border-[#1DA1F2]/50 transition-colors"
                                         >
                                             Clear Search
                                         </Button>
@@ -183,15 +226,17 @@ export default function Leaderboard({ scores, activeAddress, userRank, userTotal
                             </div>
                         ) : (
                             filteredData.map((entry, index) => {
-                                const rank = index + 1
-                                const isCurrentUser = entry.address === activeAddress
+                                const rank = entry.globalRank || index + 1
+                                const isCurrentUser = entry.address && entry.address === activeAddress
+                                const displayName = getDisplayName(entry)
+                                const hasTwitterHandle = extractTwitterUsername(entry.username, entry.twitterUsername)
 
                                 return (
-                                    <Dialog key={entry.address}>
+                                    <Dialog key={entry.username + (entry.address || '')}>
                                         <DialogTrigger asChild>
                                             <Button
                                                 variant="ghost"
-                                                className={`w-full h-auto p-3 sm:p-6 hover:bg-gradient-to-r hover:from-orange-500/10 hover:to-green-500/10 transition-all duration-300 group ${isCurrentUser ? 'ring-2 ring-orange-500/50 bg-gradient-to-r from-orange-500/10 to-green-500/10' : 'hover:scale-[1.02]'}`}
+                                                className={`w-full h-auto p-3 sm:p-6 hover:bg-gradient-to-r hover:from-[#1DA1F2]/10 hover:to-[#1DA1F2]/20 transition-all duration-300 group ${isCurrentUser ? 'ring-2 ring-[#1DA1F2]/50 bg-gradient-to-r from-[#1DA1F2]/10 to-[#1DA1F2]/20' : 'hover:scale-[1.02]'}`}
                                                 onClick={() => setSelectedEntry(entry)}
                                             >
                                                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-3 sm:gap-0">
@@ -201,25 +246,32 @@ export default function Leaderboard({ scores, activeAddress, userRank, userTotal
                                                         </div>
                                                         <div className="flex flex-col items-start flex-1 min-w-0">
                                                             <div className="flex items-center gap-2 w-full">
-                                                                <span className="font-bold text-responsive-base sm:text-lg group-hover:text-orange-600 transition-colors truncate">
-                                                                    {entry.username}
-                                                                </span>
+                                                                <div className="flex items-center gap-2 flex-1 min-w-0">
+                                                                    {hasTwitterHandle && (
+                                                                        <Twitter className="w-4 h-4 sm:w-5 sm:h-5 text-[#1DA1F2] flex-shrink-0" />
+                                                                    )}
+                                                                    <span className="font-bold text-responsive-base sm:text-lg group-hover:text-[#1DA1F2] transition-colors truncate">
+                                                                        {displayName}
+                                                                    </span>
+                                                                </div>
                                                                 <Badge variant="outline" className="text-responsive-xs font-mono bg-muted/50 border-border/50 flex-shrink-0">
                                                                     #{rank}
                                                                 </Badge>
                                                                 {isCurrentUser && (
-                                                                    <Badge variant="secondary" className="text-responsive-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 flex-shrink-0">
+                                                                    <Badge variant="secondary" className="text-responsive-xs bg-gradient-to-r from-[#1DA1F2] to-[#1DA1F2]/80 text-white border-0 flex-shrink-0">
                                                                         You
                                                                     </Badge>
                                                                 )}
                                                             </div>
-                                                            <span className="text-responsive-sm text-muted-foreground font-mono truncate w-full">
-                                                                {truncateAddress(entry.address)}
-                                                            </span>
+                                                            {entry.address && (
+                                                                <span className="text-responsive-sm text-muted-foreground font-mono truncate w-full">
+                                                                    {truncateAddress(entry.address)}
+                                                                </span>
+                                                            )}
                                                         </div>
                                                     </div>
                                                     <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-between sm:justify-end">
-                                                        <Badge variant="outline" className="text-responsive-base sm:text-lg font-bold bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-purple-500/30 text-purple-700 dark:text-purple-300">
+                                                        <Badge variant="outline" className="text-responsive-base sm:text-lg font-bold bg-gradient-to-r from-[#1DA1F2]/10 to-[#1DA1F2]/20 border-[#1DA1F2]/30 text-[#1DA1F2]">
                                                             {entry.totalPoints} XP
                                                         </Badge>
                                                         <Badge variant="secondary" className="text-responsive-xs bg-muted/50">
@@ -237,19 +289,29 @@ export default function Leaderboard({ scores, activeAddress, userRank, userTotal
                                                         {getRankIcon(rank) || rank}
                                                     </div>
                                                     <div>
-                                                        <div className="font-bold text-responsive-lg sm:text-lg">{entry.username}</div>
+                                                        <div className="flex items-center gap-2">
+                                                            {hasTwitterHandle && (
+                                                                <Twitter className="w-4 h-4 sm:w-5 sm:h-5 text-[#1DA1F2]" />
+                                                            )}
+                                                            <div className="font-bold text-responsive-lg sm:text-lg">{displayName}</div>
+                                                        </div>
                                                         <div className="text-responsive-sm text-muted-foreground">{entry.totalPoints} XP</div>
                                                     </div>
                                                 </DialogTitle>
                                             </DialogHeader>
 
                                             <div className="space-y-4">
-                                                <div className="p-3 sm:p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-xl border border-purple-500/20">
-                                                    <div className="font-semibold mb-3 text-responsive-base sm:text-base text-purple-700 dark:text-purple-300">Player Info</div>
+                                                <div className="p-3 sm:p-4 bg-gradient-to-r from-[#1DA1F2]/10 to-[#1DA1F2]/20 rounded-xl border border-[#1DA1F2]/20">
+                                                    <div className="font-semibold mb-3 text-responsive-base sm:text-base text-[#1DA1F2]">Player Info</div>
                                                     <div className="text-responsive-sm space-y-2">
-                                                        <div><span className="font-medium">Username:</span> {entry.username}</div>
-                                                        <div><span className="font-medium">Address:</span> <span className="font-mono bg-muted/50 px-2 py-1 rounded text-responsive-xs break-all">{entry.address}</span></div>
-                                                        <div><span className="font-medium">Total XP:</span> <span className="font-bold text-purple-600">{entry.totalPoints}</span></div>
+                                                        <div><span className="font-medium">Display Name:</span> {displayName}</div>
+                                                        {hasTwitterHandle && (
+                                                            <div><span className="font-medium">Twitter:</span> <span className="font-mono bg-[#1DA1F2]/10 px-2 py-1 rounded text-responsive-xs">{displayName}</span></div>
+                                                        )}
+                                                        {entry.address && (
+                                                            <div><span className="font-medium">Address:</span> <span className="font-mono bg-muted/50 px-2 py-1 rounded text-responsive-xs break-all">{entry.address}</span></div>
+                                                        )}
+                                                        <div><span className="font-medium">Total XP:</span> <span className="font-bold text-[#1DA1F2]">{entry.totalPoints}</span></div>
                                                         <div><span className="font-medium">Total Entries:</span> {entry.entries.length}</div>
                                                     </div>
                                                 </div>
@@ -258,7 +320,7 @@ export default function Leaderboard({ scores, activeAddress, userRank, userTotal
                                                     <div className="font-semibold mb-3 text-responsive-base sm:text-base">Individual Entries</div>
                                                     <div className="space-y-3">
                                                         {entry.entries.map((score, scoreIndex) => (
-                                                            <Card key={scoreIndex} className="p-3 sm:p-4 hover:bg-gradient-to-r hover:from-purple-500/5 hover:to-pink-500/5 transition-colors border-border/50">
+                                                            <Card key={scoreIndex} className="p-3 sm:p-4 hover:bg-gradient-to-r hover:from-[#1DA1F2]/5 hover:to-[#1DA1F2]/10 transition-colors border-border/50">
                                                                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                                                     <div className="flex flex-col flex-1">
                                                                         <div className="font-medium text-responsive-base">Entry #{scoreIndex + 1}</div>
@@ -268,7 +330,7 @@ export default function Leaderboard({ scores, activeAddress, userRank, userTotal
                                                                                     href={score.url}
                                                                                     target="_blank"
                                                                                     rel="noopener noreferrer"
-                                                                                    className="flex items-center gap-1 text-purple-600 hover:text-purple-800 transition-colors break-all"
+                                                                                    className="flex items-center gap-1 text-[#1DA1F2] hover:text-[#1DA1F2]/80 transition-colors break-all"
                                                                                 >
                                                                                     View Link <ExternalLink className="w-3 h-3 flex-shrink-0" />
                                                                                 </a>
@@ -286,7 +348,7 @@ export default function Leaderboard({ scores, activeAddress, userRank, userTotal
                                                                             </div>
                                                                         )}
                                                                     </div>
-                                                                    <Badge variant="outline" className="font-bold bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-purple-500/30 sm:ml-4 w-fit">
+                                                                    <Badge variant="outline" className="font-bold bg-gradient-to-r from-[#1DA1F2]/10 to-[#1DA1F2]/20 border-[#1DA1F2]/30 sm:ml-4 w-fit">
                                                                         {score.points} XP
                                                                     </Badge>
                                                                 </div>

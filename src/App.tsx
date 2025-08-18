@@ -21,6 +21,7 @@ enum Bucket {
 
 type scoreItem = {
   username: string
+  twitterUsername?: string // Twitter username (optional)
   url: string
   buckets: string // comma separated list of buckets
   points: number // calculated points for this entry
@@ -36,6 +37,7 @@ export default function App() {
   const [myTotalScore, setMyTotalScore] = useState(0)
   const [myRank, setMyRank] = useState<number | undefined>(undefined)
   const [isLoading, setIsLoading] = useState(false)
+  const [xUsername, setXUsername] = useState<string | undefined>(undefined)
 
   useEffect(() => {
     fixConnection(activeAddress, connected, disconnect)
@@ -65,35 +67,91 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    if (!connected || !activeAddress) return
-    // sum all points for my total score (points are pre-calculated by the Lua process)
-    const myTotalScore = scores.filter((score) => score.address === activeAddress).reduce((acc, score) => acc + score.points, 0)
-    setMyTotalScore(myTotalScore)
+    if (!connected || !activeAddress || !api) return
 
-    // Calculate user's rank
+    const username = api.getUsername ? api.getUsername() : undefined
+    console.log('Username:', username)
+    console.log('Address:', activeAddress)
+
+    // Don't disconnect if no username - user might be using regular Arweave wallet
+    // Only disconnect if there's an error or invalid connection
+    if (!username && api.id == "wauth-twitter") {
+      console.log('No username found - user might be using regular Arweave wallet')
+      disconnect()
+    }
+
+    setXUsername(username)
+
+    // Calculate total score and rank using the same logic as the leaderboard
     if (scores.length > 0) {
-      // Group scores by address and sum up points (same logic as leaderboard)
+      // Group scores by username (Twitter username if available, otherwise regular username) - same logic as leaderboard
       const leaderboardData = scores.reduce((acc, score) => {
-        const existingEntry = acc.find(entry => entry.address === score.address)
+        // Extract Twitter username using the same logic as leaderboard
+        const extractTwitterUsername = (username: string, twitterUsername?: string): string | null => {
+          if (twitterUsername) {
+            return twitterUsername.startsWith('@') ? twitterUsername : `@${twitterUsername}`
+          }
+          if (username.startsWith('@')) {
+            return username
+          }
+          if (username.includes('twitter.com/') || username.includes('x.com/')) {
+            const match = username.match(/(?:twitter\.com|x\.com)\/([a-zA-Z0-9_]+)/)
+            return match ? `@${match[1]}` : null
+          }
+          return null
+        }
+
+        const twitterUsername = extractTwitterUsername(score.username, score.twitterUsername)
+        const groupKey = twitterUsername || score.username
+
+        const existingEntry = acc.find(entry => {
+          const entryTwitterUsername = extractTwitterUsername(entry.username, entry.twitterUsername)
+          const entryGroupKey = entryTwitterUsername || entry.username
+          return entryGroupKey === groupKey
+        })
+
         if (existingEntry) {
           existingEntry.totalPoints += score.points
         } else {
           acc.push({
             username: score.username,
+            twitterUsername: score.twitterUsername,
             address: score.address,
             totalPoints: score.points
           })
         }
         return acc
-      }, [] as { username: string; address: string; totalPoints: number }[])
+      }, [] as { username: string; twitterUsername?: string; address: string; totalPoints: number }[])
 
       // Sort by total points in descending order
       leaderboardData.sort((a, b) => b.totalPoints - a.totalPoints)
 
-      // Find user's rank
-      const userRankIndex = leaderboardData.findIndex(entry => entry.address === activeAddress)
-      if (userRankIndex !== -1) {
+      // Find user's entry by matching address or username
+      const userEntry = leaderboardData.find(entry => {
+        // First try to match by address
+        if (entry.address === activeAddress) return true
+
+        // If no address match, try to match by username (for X users)
+        if (username && entry.username === username) return true
+
+        // For X users, also check if the entry's username matches the X username
+        if (username && entry.username.includes(username.replace('@', ''))) return true
+
+        return false
+      })
+
+      if (userEntry) {
+        setMyTotalScore(userEntry.totalPoints)
+        const userRankIndex = leaderboardData.findIndex(entry => entry === userEntry)
         setMyRank(userRankIndex + 1) // +1 because rank is 1-based
+      } else {
+        // Fallback: sum all points for the address if no match found
+        const fallbackScore = scores.filter((score) => score.address === activeAddress).reduce((acc, score) => acc + score.points, 0)
+        setMyTotalScore(fallbackScore)
+
+        // Find rank for fallback score
+        const fallbackRankIndex = leaderboardData.findIndex(entry => entry.totalPoints <= fallbackScore)
+        setMyRank(fallbackRankIndex !== -1 ? fallbackRankIndex + 1 : undefined)
       }
     }
   }, [activeAddress, connected, scores])
@@ -103,13 +161,19 @@ export default function App() {
 
 
       {/* Header */}
-      <Navbar />
+      <Navbar xUsername={xUsername} isConnected={connected} activeAddress={activeAddress} />
 
 
       <main className="flex flex-col items-center justify-center p-4 sm:p-6 gap-8 sm:px-6 lg:px-20 grow w-full relative z-10">
 
         <div className="flex items-center justify-center w-full">
-          <Hero />
+          <Hero
+            xUsername={xUsername}
+            userPoints={myTotalScore}
+            userRank={myRank}
+            isConnected={connected}
+            activeAddress={activeAddress}
+          />
         </div>
         <div className="w-full block relative">
           <div className="text-center space-y-4">
@@ -121,25 +185,7 @@ export default function App() {
               </div>
             ) : (
               <div className="space-y-4">
-                {connected ? (
-                  <div className="inline-flex items-center gap-3 px-6 py-4 bg-gradient-to-r from-orange-500/10 to-green-500/10 rounded-2xl border border-orange-500/20 shadow-lg hover-lift">
-                    <Zap className="w-5 h-5 text-orange-600 animate-bounce-gentle" />
-                    <span className="text-muted-foreground">Your Score:</span>
-                    <span className="font-bold text-2xl bg-gradient-to-r from-orange-600 to-green-600 bg-clip-text text-transparent">
-                      {myTotalScore}
-                    </span>
-                    <span className="text-muted-foreground">XP</span>
-                    {myRank && (
-                      <>
-                        <span className="text-muted-foreground">•</span>
-                        <span className="text-muted-foreground">Rank</span>
-                        <span className="font-bold text-xl bg-gradient-to-r from-orange-600 to-green-600 bg-clip-text text-transparent">
-                          #{myRank}
-                        </span>
-                      </>
-                    )}
-                  </div>
-                ) : (
+                {!connected && (
                   <Button
                     onClick={connect}
                     className="px-8 py-4 mb-12 text-lg bg-[#f59b30] text-white border-0 shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 transition-all duration-200 hover:scale-105"
