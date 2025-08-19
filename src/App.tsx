@@ -175,6 +175,18 @@ export default function App() {
             activeAddress={activeAddress}
           />
         </div>
+
+        {/* Rules Section */}
+        <div className="w-full max-w-7xl mx-auto my-0 -mt-2">
+          <div className="flex justify-center">
+            <img
+              src="/rules.png"
+              alt="Leaderboard Rules - How to earn XP points"
+              className="w-full max-w-3xl h-auto rounded-lg shadow-lg"
+            />
+          </div>
+        </div>
+
         <div className="w-full block relative">
           <div className="text-center space-y-4">
 
